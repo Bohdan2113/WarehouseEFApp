@@ -25,7 +25,6 @@ services.AddScoped<ConsoleUIService>();
 services.AddScoped<PersonConsoleService>();
 
 var serviceProvider = services.BuildServiceProvider();
-
 // Resolve services
 var uiService = serviceProvider.GetRequiredService<ConsoleUIService>();
 var personConsoleService = serviceProvider.GetRequiredService<PersonConsoleService>();

@@ -13,6 +13,8 @@ public partial class Person
 
     public string? Position { get; set; }
 
+    public string? Email { get; set; }
+
     public virtual ICollection<DeliveryDocument> DeliveryDocuments { get; set; } = new List<DeliveryDocument>();
 
     public virtual ICollection<ShippingDocument> ShippingDocuments { get; set; } = new List<ShippingDocument>();
