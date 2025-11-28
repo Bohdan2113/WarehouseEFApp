@@ -2,9 +2,7 @@ using WarehouseEFApp.Models;
 
 namespace WarehouseEFApp.Services;
 
-/// <summary>
-/// Service for displaying menu and formatting console output
-/// </summary>
+
 public class ConsoleUIService
 {
     public void ShowMainMenu(string currentFramework = "EF")

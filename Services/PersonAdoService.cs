@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
-using Npgsql; // For SQL Server, replace with Npgsql for PostgreSQL
+using Npgsql;
 using Microsoft.Extensions.Configuration;
 using WarehouseEFApp.Models;
 

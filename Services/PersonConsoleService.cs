@@ -2,9 +2,6 @@ using WarehouseEFApp.Models;
 
 namespace WarehouseEFApp.Services;
 
-/// <summary>
-/// Service for handling Person operations via the console
-/// </summary>
 public class PersonConsoleService
 {
     private readonly PersonService _personService;

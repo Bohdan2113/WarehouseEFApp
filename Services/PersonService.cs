@@ -4,9 +4,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace WarehouseEFApp.Services;
 
-/// <summary>
-/// Service for CRUD operations on Person (DB First approach)
-/// </summary>
+
 public class PersonService
 {
     private readonly WarehouseDbContext _context;
@@ -16,7 +14,6 @@ public class PersonService
         _context = context;
     }
 
-    // ============ CREATE ============
     public async Task<Person> CreateAsync(string firstName, string lastName, string position)
     {
         if (string.IsNullOrWhiteSpace(firstName) || string.IsNullOrWhiteSpace(lastName))
@@ -34,7 +31,6 @@ public class PersonService
         return person;
     }
 
-    // ============ READ ============
     public async Task<Person?> GetByIdAsync(int id)
     {
         return await _context.People.FirstOrDefaultAsync(p => p.Id == id);
@@ -55,7 +51,6 @@ public class PersonService
             .ToListAsync();
     }
 
-    // ============ UPDATE ============
     public async Task<Person> UpdateAsync(int id, string? firstName = null, string? lastName = null, string? position = null)
     {
         var person = await _context.People.FirstOrDefaultAsync(p => p.Id == id);
@@ -76,7 +71,6 @@ public class PersonService
         return person;
     }
 
-    // ============ DELETE ============
     public async Task DeleteAsync(int id)
     {
         var person = await _context.People.FirstOrDefaultAsync(p => p.Id == id);
@@ -87,7 +81,6 @@ public class PersonService
         await _context.SaveChangesAsync();
     }
 
-    // ============ ADDITIONAL ============
     public async Task<int> GetTotalCountAsync()
     {
         return await _context.People.CountAsync();

@@ -10,7 +10,7 @@ var configuration = new ConfigurationBuilder()
     .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
     .Build();
 
-// DI container
+// DI
 var services = new ServiceCollection();
 services.AddSingleton<IConfiguration>(configuration);
 services.AddDbContext<WarehouseDbContext>(options =>
@@ -25,15 +25,12 @@ services.AddScoped<ConsoleUIService>();
 services.AddScoped<PersonConsoleService>();
 
 var serviceProvider = services.BuildServiceProvider();
-// Resolve services
+
 var uiService = serviceProvider.GetRequiredService<ConsoleUIService>();
 var personConsoleService = serviceProvider.GetRequiredService<PersonConsoleService>();
 
-// ========================================
-// MAIN PROGRAM
-// ========================================
 
-string currentFramework = "EF"; // default EF
+string currentFramework = "EF"; 
 bool running = true;
 
 while (running)

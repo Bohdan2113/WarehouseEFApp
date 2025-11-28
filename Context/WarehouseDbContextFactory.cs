@@ -10,7 +10,6 @@ public class WarehouseDbContextFactory : IDesignTimeDbContextFactory<WarehouseDb
 {
     public WarehouseDbContext CreateDbContext(string[] args)
     {
-        // Use the current directory so the factory works when run from the project folder
         var basePath = Directory.GetCurrentDirectory();
 
         var config = new ConfigurationBuilder()
