@@ -1,0 +1,70 @@
+# .gitignore for .NET / Visual Studio projects
+
+# Build outputs
+/bin/
+/obj/
+/out/
+
+# Visual Studio temporary files, build results, and
+# user-specific files
+.vs/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+*.VC.db
+
+# Rider
+.idea/
+*.sln.iml
+
+# Visual Studio Code
+.vscode/
+
+# Publish output
+/publish/
+
+# NuGet packages
+*.nupkg
+.nuget/
+
+# Entity Framework local DB
+*.mdf
+*.ldf
+*.ndf
+*.db
+*.sqlite
+*.sqlite3
+
+# Logs
+*.log
+
+# OS files
+Thumbs.db
+.DS_Store
+
+# Resharper
+_ReSharper*/
+*.DotSettings.user
+
+# Coverage and test artifacts
+coverage*/
+coverage*.xml
+
+# Temporary files
+*.tmp
+*.temp
+
+# User secrets and local appsettings (uncomment if you want to ignore them)
+# secrets.json
+# appsettings.Local.json
+# appsettings.Development.json
+
+# Ignore package managers
+node_modules/
+
+# Lock files (optionally track these depending on project)
+# package-lock.json
+# yarn.lock
+
+# End of .gitignore
