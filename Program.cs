@@ -30,7 +30,7 @@ var uiService = serviceProvider.GetRequiredService<ConsoleUIService>();
 var personConsoleService = serviceProvider.GetRequiredService<PersonConsoleService>();
 
 
-string currentFramework = "EF"; 
+string currentFramework = "EF";
 bool running = true;
 
 while (running)
@@ -62,6 +62,9 @@ while (running)
                 string newFrameworkName = currentFramework == "EF" ? "Entity Framework" : "ADO.NET";
                 uiService.ShowSuccessMessage($"Switched to {newFrameworkName}");
                 uiService.PressEnterToContinue();
+                break;
+            case "7":
+                await personConsoleService.SeedUserAsync(currentFramework);
                 break;
             case "0":
                 running = false;

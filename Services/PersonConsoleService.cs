@@ -147,6 +147,30 @@ public class PersonConsoleService
         }
     }
 
+    public async Task SeedUserAsync(string framework = "EF")
+    {
+        List<Person> added = await _personService.SeedUsersAsync();
+
+        if (added.Count == 0)
+        {
+            _uiService.ShowSuccessMessage("No people found in database.");
+        }
+        else
+        {
+            foreach (var person in added)
+            {
+                _uiService.ShowSuccessMessage(
+                    $"Person added successfully ({framework})!\n" +
+                    $"   Name: {person.FirstName} {person.LastName}\n" +
+                    $"   Position: {person.Position}"
+                );
+            }
+        }
+
+        _uiService.ShowSuccessMessage("Seed successful");
+    }
+
+
     public async Task DeleteAsync(string framework = "EF")
     {
         Console.WriteLine("\n--- DELETE PERSON ---");

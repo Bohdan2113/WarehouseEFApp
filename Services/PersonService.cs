@@ -81,6 +81,37 @@ public class PersonService
         await _context.SaveChangesAsync();
     }
 
+// у PersonService
+public async Task<List<Person>> SeedUsersAsync()
+{
+    var usersToSeed = new List<Person>
+    {
+        new Person { FirstName = "Admin", LastName = "User", Position = "System Administrator" },
+        new Person { FirstName = "Test",  LastName = "User", Position = "QA" }
+    };
+
+    var addedUsers = new List<Person>();
+
+    foreach (var user in usersToSeed)
+    {
+        bool exists = await _context.People
+            .AnyAsync(p => p.FirstName == user.FirstName && p.LastName == user.LastName);
+
+        if (!exists)
+        {
+            _context.People.Add(user);
+            addedUsers.Add(user);
+        }
+    }
+
+    if (addedUsers.Count > 0)
+        await _context.SaveChangesAsync();
+
+    return addedUsers;
+}
+
+
+
     public async Task<int> GetTotalCountAsync()
     {
         return await _context.People.CountAsync();

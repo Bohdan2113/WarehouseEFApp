@@ -18,8 +18,9 @@ public class ConsoleUIService
         Console.WriteLine("  [4] Update person");
         Console.WriteLine("  [5] Delete person");
         Console.WriteLine("  [6] Toggle framework (current: " + frameworkDisplay + ")");
+        Console.WriteLine("  [7] Seed users");
         Console.WriteLine("  [0] Exit\n");
-        Console.Write("Choose an operation [0-6]: ");
+        Console.Write("Choose an operation [0-7]: ");
     }
 
     public void ShowSuccessMessage(string message)
