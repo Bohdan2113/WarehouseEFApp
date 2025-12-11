@@ -1,84 +1,94 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
+using Microsoft.OpenApi.Models;
+using AutoMapper;
 using WarehouseEFApp.Context;
-using WarehouseEFApp.Services;
+using WarehouseEFApp.Mappings;
 
-// Configuration
-var configuration = new ConfigurationBuilder()
-    .SetBasePath(Directory.GetCurrentDirectory())
-    .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
-    .Build();
+// Builder configuration
+var builder = WebApplication.CreateBuilder(args);
 
-// DI
-var services = new ServiceCollection();
-services.AddSingleton<IConfiguration>(configuration);
-services.AddDbContext<WarehouseDbContext>(options =>
+// Database configuration
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+builder.Services.AddDbContext<WarehouseDbContext>(options =>
+    options.UseNpgsql(connectionString));
+
+// AutoMapper configuration
+builder.Services.AddAutoMapper(typeof(MappingProfile));
+
+// Add controllers
+builder.Services.AddControllers();
+
+// Swagger/OpenAPI configuration
+builder.Services.AddSwaggerGen(c =>
 {
-    var connectionString = configuration.GetConnectionString("DefaultConnection");
-    options.UseNpgsql(connectionString);
+    c.SwaggerDoc("v1", new OpenApiInfo
+    {
+        Title = "Warehouse API",
+        Version = "v1",
+        Description = "REST API для управління складом",
+        Contact = new OpenApiContact
+        {
+            Name = "Warehouse System",
+            Email = "support@warehouse.local"
+        }
+    });
+
+    // XML comments
+    var xmlFile = "WarehouseEFApp.xml";
+    var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+    if (File.Exists(xmlPath))
+        c.IncludeXmlComments(xmlPath);
+
+    c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    {
+        Description = "JWT Authorization header using the Bearer scheme",
+        Name = "Authorization",
+        In = ParameterLocation.Header,
+        Type = SecuritySchemeType.Http,
+        Scheme = "bearer",
+        BearerFormat = "JWT"
+    });
 });
 
-services.AddScoped<PersonService>();
-services.AddScoped<PersonAdoService>();
-services.AddScoped<ConsoleUIService>();
-services.AddScoped<PersonConsoleService>();
-
-var serviceProvider = services.BuildServiceProvider();
-
-var uiService = serviceProvider.GetRequiredService<ConsoleUIService>();
-var personConsoleService = serviceProvider.GetRequiredService<PersonConsoleService>();
-
-
-string currentFramework = "EF";
-bool running = true;
-
-while (running)
+// CORS configuration
+builder.Services.AddCors(options =>
 {
-    uiService.ShowMainMenu(currentFramework);
-    string choice = Console.ReadLine() ?? "";
+    options.AddPolicy("AllowAll", policy =>
+    {
+        policy.AllowAnyOrigin()
+            .AllowAnyMethod()
+            .AllowAnyHeader();
+    });
+});
 
-    try
+// Build app
+var app = builder.Build();
+
+// Middleware configuration
+if (app.Environment.IsDevelopment())
+{
+    app.UseSwagger(options =>
     {
-        switch (choice)
-        {
-            case "1":
-                await personConsoleService.CreateAsync(currentFramework);
-                break;
-            case "2":
-                await personConsoleService.ViewAllAsync(currentFramework);
-                break;
-            case "3":
-                await personConsoleService.ViewByIdAsync(currentFramework);
-                break;
-            case "4":
-                await personConsoleService.UpdateAsync(currentFramework);
-                break;
-            case "5":
-                await personConsoleService.DeleteAsync(currentFramework);
-                break;
-            case "6":
-                currentFramework = currentFramework == "EF" ? "ADO" : "EF";
-                string newFrameworkName = currentFramework == "EF" ? "Entity Framework" : "ADO.NET";
-                uiService.ShowSuccessMessage($"Switched to {newFrameworkName}");
-                uiService.PressEnterToContinue();
-                break;
-            case "7":
-                await personConsoleService.SeedUserAsync(currentFramework);
-                break;
-            case "0":
-                running = false;
-                Console.WriteLine("\nGoodbye!");
-                break;
-            default:
-                uiService.ShowErrorMessage("Invalid choice. Try again.");
-                uiService.PressEnterToContinue();
-                break;
-        }
-    }
-    catch (Exception ex)
+        options.RouteTemplate = "swagger/{documentName}/swagger.json";
+    });
+    app.UseSwaggerUI(c =>
     {
-        uiService.ShowErrorMessage(ex.Message);
-        uiService.PressEnterToContinue();
-    }
+        c.SwaggerEndpoint("/swagger/v1/swagger.json", "Warehouse API v1");
+        c.RoutePrefix = "swagger"; // Swagger буде за адресою /swagger
+        c.DocumentTitle = "Warehouse API - Swagger";
+    });
 }
+
+app.UseHttpsRedirection();
+app.UseRouting();
+app.UseCors("AllowAll");
+app.UseAuthorization();
+
+// Map controllers
+app.MapControllers();
+
+// Маршрут для кореневої сторінки
+app.MapGet("/", () => Results.Redirect("/swagger")).WithName("Root");
+
+// Run app
+app.Run();

@@ -144,9 +144,6 @@ public partial class WarehouseDbContext : DbContext
             entity.Property(e => e.Name)
                 .HasMaxLength(150)
                 .HasColumnName("name");
-            entity.Property(e => e.Unit)
-                .HasMaxLength(20)
-                .HasColumnName("unit");
 
             entity.HasOne(d => d.Category).WithMany(p => p.Products)
                 .HasForeignKey(d => d.CategoryId)

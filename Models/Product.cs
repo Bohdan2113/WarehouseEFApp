@@ -11,8 +11,6 @@ public partial class Product
 
     public int CategoryId { get; set; }
 
-    public string Unit { get; set; } = null!;
-
     public DateOnly DateAdded { get; set; }
 
     public virtual ICollection<Availability> Availabilities { get; set; } = new List<Availability>();
