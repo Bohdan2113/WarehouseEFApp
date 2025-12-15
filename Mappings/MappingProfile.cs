@@ -4,9 +4,6 @@ using WarehouseEFApp.Models;
 
 namespace WarehouseEFApp.Mappings;
 
-/// <summary>
-/// AutoMapper профіль дляMapping між моделями та DTOs
-/// </summary>
 public class MappingProfile : Profile
 {
     public MappingProfile()

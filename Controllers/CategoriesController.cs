@@ -8,9 +8,6 @@ using WarehouseEFApp.Models;
 
 namespace WarehouseEFApp.Controllers;
 
-/// <summary>
-/// API контролер для управління категоріями продуктів
-/// </summary>
 [ApiController]
 [Route("api/[controller]")]
 [Produces("application/json")]
@@ -19,29 +16,20 @@ public class CategoriesController : ControllerBase
     private readonly WarehouseDbContext _context;
     private readonly IMapper _mapper;
 
-    /// <summary>
-    /// Конструктор з dependency injection
-    /// </summary>
+    // Constructor з dependency injection
     public CategoriesController(WarehouseDbContext context, IMapper mapper)
     {
         _context = context;
         _mapper = mapper;
     }
 
-    /// <summary>
-    /// Отримати всі категорії з пагінацією
-    /// </summary>
-    /// <param name="page">Номер сторінки (за замовчуванням 1)</param>
-    /// <param name="pageSize">Розмір сторінки (за замовчуванням 10, макс 100)</param>
-    /// <returns>Пагінований список категорій</returns>
-    /// <response code="200">Успішно повернено список категорій</response>
     [HttpGet]
     [ProducesResponseType(typeof(PaginatedResultDTO<CategoryReadDTO>), StatusCodes.Status200OK)]
     public async Task<ActionResult<PaginatedResultDTO<CategoryReadDTO>>> GetAll(
         [FromQuery] int page = 1,
         [FromQuery] int pageSize = PaginationConstants.DefaultPageSize)
     {
-        // Валідація параметрів
+        // Validate Parameters
         if (page < PaginationConstants.MinPageNumber)
             page = PaginationConstants.MinPageNumber;
 
@@ -51,10 +39,8 @@ public class CategoriesController : ControllerBase
         if (pageSize > PaginationConstants.MaxPageSize)
             pageSize = PaginationConstants.MaxPageSize;
 
-        // Отримати загальну кількість записів
         var totalCount = await _context.Categories.CountAsync();
 
-        // Отримати дані поточної сторінки
         var categories = await _context.Categories
             .OrderBy(c => c.Id)
             .Skip((page - 1) * pageSize)
@@ -67,13 +53,6 @@ public class CategoriesController : ControllerBase
         return Ok(result);
     }
 
-    /// <summary>
-    /// Отримати категорію за ID
-    /// </summary>
-    /// <param name="id">ID категорії</param>
-    /// <returns>Категорія з вказаним ID</returns>
-    /// <response code="200">Категорія знайдена</response>
-    /// <response code="404">Категорія не знайдена</response>
     [HttpGet("{id}")]
     [ProducesResponseType(typeof(CategoryReadDTO), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -81,20 +60,12 @@ public class CategoriesController : ControllerBase
     {
         var category = await _context.Categories.FindAsync(id);
         if (category == null)
-            return NotFound(new { message = $"Категорія з ID {id} не знайдена" });
+            return NotFound(new { message = $"Category with ID {id} not found" });
 
         var dto = _mapper.Map<CategoryReadDTO>(category);
         return Ok(dto);
     }
 
-    /// <summary>
-    /// Створити нову категорію
-    /// </summary>
-    /// <param name="dto">Дані категорії для створення</param>
-    /// <returns>Створена категорія</returns>
-    /// <response code="201">Категорія успішно створена</response>
-    /// <response code="400">Некоректні дані</response>
-    /// <response code="409">Категорія з такою назвою вже існує</response>
     [HttpPost]
     [ProducesResponseType(typeof(CategoryReadDTO), StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -104,9 +75,9 @@ public class CategoriesController : ControllerBase
         if (!ModelState.IsValid)
             return BadRequest(ModelState);
 
-        // Перевірити унікальність назви
+        // Check name uniqueness
         if (await _context.Categories.AnyAsync(c => c.Name == dto.Name))
-            return Conflict(new { message = "Категорія з такою назвою вже існує" });
+            return Conflict(new { message = "Category with this name already exists" });
 
         var category = _mapper.Map<Category>(dto);
         _context.Categories.Add(category);
@@ -116,16 +87,6 @@ public class CategoriesController : ControllerBase
         return CreatedAtAction(nameof(GetById), new { id = category.Id }, resultDto);
     }
 
-    /// <summary>
-    /// Оновити категорію
-    /// </summary>
-    /// <param name="id">ID категорії</param>
-    /// <param name="dto">Оновлені дані категорії</param>
-    /// <returns>Оновлена категорія</returns>
-    /// <response code="200">Категорія успішно оновлена</response>
-    /// <response code="400">Некоректні дані</response>
-    /// <response code="404">Категорія не знайдена</response>
-    /// <response code="409">Назва вже використовується іншою категорією</response>
     [HttpPut("{id}")]
     [ProducesResponseType(typeof(CategoryReadDTO), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -138,11 +99,11 @@ public class CategoriesController : ControllerBase
 
         var category = await _context.Categories.FindAsync(id);
         if (category == null)
-            return NotFound(new { message = $"Категорія з ID {id} не знайдена" });
+            return NotFound(new { message = $"Catgory with ID {id} not found" });
 
-        // Перевірити унікальність назви (якщо змінюється)
+        // Check name uniqueness
         if (category.Name != dto.Name && await _context.Categories.AnyAsync(c => c.Name == dto.Name))
-            return Conflict(new { message = "Категорія з такою назвою вже існує" });
+            return Conflict(new { message = "Category with this name already exists" });
 
         _mapper.Map(dto, category);
         _context.Categories.Update(category);
@@ -152,14 +113,6 @@ public class CategoriesController : ControllerBase
         return Ok(resultDto);
     }
 
-    /// <summary>
-    /// Видалити категорію
-    /// </summary>
-    /// <param name="id">ID категорії</param>
-    /// <returns>Статус видалення</returns>
-    /// <response code="204">Категорія успішно видалена</response>
-    /// <response code="404">Категорія не знайдена</response>
-    /// <response code="400">Не можна видалити категорію з продуктами</response>
     [HttpDelete("{id}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -168,11 +121,11 @@ public class CategoriesController : ControllerBase
     {
         var category = await _context.Categories.FindAsync(id);
         if (category == null)
-            return NotFound(new { message = $"Категорія з ID {id} не знайдена" });
+            return NotFound(new { message = $"Category with ID {id} not found" });
 
-        // Перевірити, чи є продукти в цій категорії
+        // Check if category has products
         if (await _context.Products.AnyAsync(p => p.CategoryId == id))
-            return BadRequest(new { message = "Не можна видалити категорію, яка містить продукти" });
+            return BadRequest(new { message = "You can not delete category thet has products" });
 
         _context.Categories.Remove(category);
         await _context.SaveChangesAsync();
