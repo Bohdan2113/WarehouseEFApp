@@ -62,6 +62,4 @@ app.UseAuthorization();
 
 app.MapControllers();
 
-// app.MapGet("/", () => Results.Redirect("/swagger")).WithName("Root");
-
 app.Run();
